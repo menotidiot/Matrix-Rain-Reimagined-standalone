@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Matrix Rain Reimagined Standalone</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { background: #000; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<canvas></canvas>
+<script>
+(function(){
+    // Defaults from LivelyProperties.json
+    let fontSize = 14;
+    let font = "Arial";
+    let delay = 40;
+    let letters = "ネバーゴナーギブユーアップ1234".split("");
+    let specialLetters = "ッ12".split("");
+    let primaryColor = "#3cd5ff";
+    let secondaryColor = "#3cd5ff";
+    let isRainbowEnabled = false;
+    let rainbowColors = ["#ff0000","#ff7f00","#ffff00","#00ff00","#0000ff","#4b0082","#9400d3"];
+    let rainbowIndex = 0;
+
+    let canvas = document.querySelector("canvas");
+    let ctx = canvas.getContext("2d");
+
+    let columns, drops, timeoutId;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = [];
+        for (let i = 0; i < columns; i++) drops[i] = 1;
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function draw() {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < drops.length; i++) {
+            let text = letters[Math.floor(Math.random() * letters.length)] || "v";
+            ctx.fillStyle = primaryColor;
+
+            if (specialLetters.includes(text)) ctx.fillStyle = secondaryColor;
+            if (isRainbowEnabled) {
+                ctx.fillStyle = rainbowColors[rainbowIndex];
+                rainbowIndex = (rainbowIndex + 1) % rainbowColors.length;
+            }
+
+            ctx.font = fontSize + "px " + font;
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+            drops[i]++;
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) {
+                drops[i] = 0;
+            }
+        }
+        timeoutId = setTimeout(draw, delay);
+    }
+
+    draw();
+})();
+</script>
+</body>
+</html>
